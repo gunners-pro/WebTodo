@@ -2,14 +2,16 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<RadzenRow Style="height: 100%;" AlignItems="AlignItems.Center">
+    <RadzenStack AlignItems="AlignItems.Center" Style="width:60%;">
+        <RadzenImage Path="next_tasks.png" Style="width: 60%;" AlternateText="Tarefa" />
+    </RadzenStack>
 
-Welcome to your new app.
-
-<RadzenButton Click="@ButtonClicked" Text="Hi"></RadzenButton>
-@code {
-    void ButtonClicked()
-    {
-        // Handle the Click event of RadzenButton
-    }
-}
+    <RadzenStack class="rz-background-color-base-50" Style="height:100%;width:38%;" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+        <RadzenText TextStyle="TextStyle.DisplayH4">
+            Seja Bem vindo!
+        </RadzenText>        
+        <RadzenButton Size="ButtonSize.Large" Text="Fazer Login" />
+        <RadzenButton Size="ButtonSize.Large" Text="Criar conta" Variant="Variant.Outlined" />
+    </RadzenStack>
+</RadzenRow>

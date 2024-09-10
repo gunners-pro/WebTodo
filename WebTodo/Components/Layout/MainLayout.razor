@@ -1,7 +1,11 @@
 ﻿@inherits LayoutComponentBase
 <RadzenComponents @rendermode="InteractiveServer" />
 
-@Body
+<RadzenLayout class="rz-background-color-white">
+    <RadzenBody Style="padding: 0;">
+        @Body
+    </RadzenBody>
+</RadzenLayout>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
