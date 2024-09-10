@@ -1,0 +1,87 @@
+﻿@page "/login"
+@using WebTodo.DTOs.Account.Login
+@inject HttpClient _http
+@inject NavigationManager navigationManager
+@inject NotificationService notification
+@inject ILocalStorageService localStorage
+
+<PageTitle>Login</PageTitle>
+
+<RadzenRow Style="height: 100vh;">
+    <RadzenStack Style="width: 60%;" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+        <RadzenImage Path="next_tasks.png" Style="width: 50%;" AlternateText="Tarefa" />
+    </RadzenStack>
+
+    <RadzenStack Style="width: 38%;" class="rz-background-color-base-50" JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center">
+            <RadzenText TextStyle="TextStyle.DisplayH4">
+                Seja Bem vindo!
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle1">
+                Preencha os dados abaixo para começar!
+            </RadzenText>
+        </RadzenStack>
+        <RadzenTemplateForm Context="teste" @ref="form" Data="@model" TItem="LoginViewModel" Submit="@OnSubmit">
+            <RadzenStack Style="padding: 0 100px;">
+                <RadzenFormField Text="Email">
+                    <RadzenTextBox @bind-Value="@model.Email" Name="Email" />
+                </RadzenFormField>
+                <RadzenRequiredValidator Component="Email" Text="Digite o E-mail" />
+                <RadzenEmailValidator Component="Email" Text="Digite um e-mail válido" />
+                <RadzenFormField Text="Senha">
+                    <RadzenPassword @bind-Value="@model.Password" Name="Password" />
+                </RadzenFormField>
+                <RadzenRequiredValidator Component="Password" Text="Digite a senha" />
+                <RadzenLengthValidator Component="Password" Min="6" Text="Deve conter no mínimo 6 caracteres" />
+                <RadzenButton Style="width: 100%" ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Text="Entrar" />
+            </RadzenStack>
+        </RadzenTemplateForm>
+
+
+    </RadzenStack>
+</RadzenRow>
+
+@code {
+    LoginViewModel model = new LoginViewModel();
+    RadzenTemplateForm<LoginViewModel> form = new RadzenTemplateForm<LoginViewModel>();
+
+    async void OnSubmit(LoginViewModel loginViewModel)
+    {
+        if (form.IsValid)
+        {
+            var jsonPayload = JsonSerializer.Serialize(model);
+            var requestContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+            var response = await _http.PostAsync("/user/login", requestContent);
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ResultErrorDTO>();
+                ShowNotificationErrorLogin(result!.message);
+            }
+            else if (response.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ResultErrorDTO>();
+                ShowNotificationErrorLogin(result!.message);
+            }
+            else
+            {
+                var result = await response.Content.ReadFromJsonAsync<ResultSuccessDTO>();
+                await localStorage.SetItemAsync<string>("accessToken", result!.token);
+                navigationManager.NavigateTo("/todos");
+            }
+        }
+    }
+
+    private void ShowNotificationErrorLogin(string detail)
+    {
+        NotificationMessage message = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Ocorreu um erro",
+                Detail = detail,
+                Duration = 3000
+            };
+
+        notification.Notify(message);
+    }
+}

@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Radzen;
 using WebTodo.Components;
 
@@ -5,6 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 {
     builder.Services.AddRadzenComponents();
+    builder.Services.AddBlazoredLocalStorage();
+    builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5237") });
 }
 
 builder.Services.AddRazorComponents()

@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject NavigationManager navigationManager
 
 <PageTitle>Home</PageTitle>
 
@@ -11,7 +12,14 @@
         <RadzenText TextStyle="TextStyle.DisplayH4">
             Seja Bem vindo!
         </RadzenText>        
-        <RadzenButton Size="ButtonSize.Large" Text="Fazer Login" />
+        <RadzenButton Size="ButtonSize.Large" Text="Fazer Login" Click="HandleLoginPage" />
         <RadzenButton Size="ButtonSize.Large" Text="Criar conta" Variant="Variant.Outlined" />
     </RadzenStack>
 </RadzenRow>
+
+@code {
+    private void HandleLoginPage()
+    {
+        navigationManager.NavigateTo("/login");
+    }
+}
