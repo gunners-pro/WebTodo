@@ -1,0 +1,34 @@
+﻿@using WebTodo.ViewModels.Todo
+
+<RadzenCard class="rz-my-8">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0">
+                <RadzenCheckBox @bind-Value="@Todo.isCompleted" Name="CheckBox1" />
+                <RadzenLabel Text="@Todo.title" Component="CheckBox1" class="rz-ms-2" Style="margin-top:-3px; text-align:justify;" />
+            </RadzenStack>
+            <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Dark" IsPill="true" Style="width:fit-content;" class="rz-p-1">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0; text-transform: none;">
+                    <RadzenIcon Icon="date_range" Style="font-size: 1rem" /> Criado em: @DateOnly.Parse(Todo.createdOn)
+                </RadzenStack>
+            </RadzenBadge>
+        </RadzenStack>
+        <RadzenStack>
+            <RadzenButton ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Style="width:6rem; padding:4px;">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0;">
+                    <RadzenIcon Icon="launch" Style="font-size: 1rem" /> Editar
+                </RadzenStack>
+            </RadzenButton>
+            <RadzenButton ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Style="width:6rem; padding:4px;">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0;">
+                    <RadzenIcon Icon="delete" Style="font-size: 1rem" /> Deletar
+                </RadzenStack>
+            </RadzenButton>
+        </RadzenStack>
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    [Parameter]
+    public TodosViewModel Todo { get; set; } = new();
+}

@@ -12,7 +12,7 @@
         <RadzenText TextStyle="TextStyle.DisplayH4">
             Seja Bem vindo!
         </RadzenText>        
-        <RadzenButton Size="ButtonSize.Large" Text="Fazer Login" Click="HandleLoginPage" />
+            <RadzenButton Size="ButtonSize.Large" Text="Fazer Login" Click="HandleLoginPage" />        
         <RadzenButton Size="ButtonSize.Large" Text="Criar conta" Variant="Variant.Outlined" Click="HandleCreateAccountPage" />
     </RadzenStack>
 </RadzenRow>
@@ -20,11 +20,11 @@
 @code {
     private void HandleLoginPage()
     {
-        navigationManager.NavigateTo("/login");
+        navigationManager.NavigateTo("/login", true);
     }
 
     private void HandleCreateAccountPage()
     {
-        navigationManager.NavigateTo("/create-account");
+        navigationManager.NavigateTo("/create-account", true);
     }
 }
