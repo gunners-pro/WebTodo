@@ -1,0 +1,61 @@
+﻿@page "/todos"
+@using WebTodo.Provider
+@using WebTodo.ViewModels.Todo
+@using System.Net.Http.Headers
+@inject ILocalStorageService localStorage
+@inject AuthenticationStateProvider _authenticationStateProvider
+@rendermode InteractiveServer
+
+@inject HttpClient _http
+
+<PageTitle>Todos</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <h3>Todos</h3><br />
+        @if(todos.Count <= 0)
+        {
+            <p>Não possui nenhuma Tarefa.</p>
+        }
+        else
+        {
+            <ul>
+            @foreach(var todo in todos)
+            {
+            <li>Título: @todo.title</li>
+            <li>Completa: @todo.isCompleted</li>
+            <li>Criado em: @todo.createdOn</li>
+            }
+            </ul>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Sem autorização</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    List<TodosViewModel> todos { get; set; } = [];
+
+    protected override async void OnInitialized()
+    {
+        var token = await localStorage.GetItemAsync<string>("accessToken");
+        _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            var authStateProvider = (AuthStateProvider) _authenticationStateProvider;
+            authStateProvider.NotifyAuthState(token);
+        }
+
+        var response = await _http.GetAsync("/todo");
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var content = await response.Content.ReadFromJsonAsync<List<TodosViewModel>>();
+            todos.AddRange(content!);
+            StateHasChanged();
+        }
+        
+    }
+
+}
