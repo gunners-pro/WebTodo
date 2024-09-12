@@ -9,8 +9,12 @@
     <RadzenSidebar @bind-Expanded="@sidebarExpanded">
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Tarefas" Icon="home" Path="/todos" />
-            <RadzenPanelMenuItem Text="Usuários" Icon="account_box" Path="/users" />
-        </RadzenPanelMenu>        
+            <RadzenPanelMenuItem Text="Usuários" Icon="account_box">
+                <RadzenPanelMenuItem Text="Listar usuários" Icon="list" Path="/users" />
+                <RadzenPanelMenuItem Text="Cadastrar usuários" Icon="note_add" />
+            </RadzenPanelMenuItem>
+        </RadzenPanelMenu>      
+        
     </RadzenSidebar>
     <RadzenBody Style="padding:50px 150px">
         @Body       

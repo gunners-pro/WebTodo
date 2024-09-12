@@ -25,15 +25,25 @@
                     <RadzenButton Text="Adicionar" ButtonType="ButtonType.Submit" Style="height:var(--rz-input-height);margin-top: 8px;" />
                 </RadzenStack>
             </RadzenStack>
-        </RadzenTemplateForm>
-        <RadzenText class="rz-mt-5">Total de tarefas - @todos.Count</RadzenText>
+        </RadzenTemplateForm>        
 
         @if (todos.Count <= 0)
         {
-            <p>Não possui nenhuma Tarefa.</p>
+            <RadzenCard class="rz-mt-6">
+                <RadzenStack AlignItems="AlignItems.Center">
+                    <RadzenText TextStyle="TextStyle.DisplayH5">Não possui nenhuma Tarefa.</RadzenText>
+                    <RadzenImage Style="width:64px;" Path="tarefa.png" />
+                    <RadzenText TextStyle="TextStyle.Caption">Adicione uma nova tarefa</RadzenText>
+                </RadzenStack>
+            </RadzenCard>            
         }
         else
         {
+            <RadzenBadge BadgeStyle="BadgeStyle.Light" Style="text-transform:none;" class="rz-mt-4">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenText Style="margin-bottom:0;">Total de tarefas - @todos.Count</RadzenText>
+                </RadzenStack>
+            </RadzenBadge>
             @foreach (var todo in todos)
             {
                 <CardTodo Todo="@todo" />

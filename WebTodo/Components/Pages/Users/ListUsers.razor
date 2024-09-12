@@ -6,7 +6,13 @@
         <h3>Listar usuários</h3>
     </Authorized>
     <NotAuthorized>
-        <h3>Sem permissão</h3>
+        <RadzenCard>
+            <RadzenStack AlignItems="AlignItems.Center">
+                <RadzenText TextStyle="TextStyle.DisplayH5">Sem permissão</RadzenText>
+                <RadzenImage Style="width:128px;" Path="seguro.png" />
+                <RadzenText TextStyle="TextStyle.Caption">Contate o administrador do sistema.</RadzenText>
+            </RadzenStack>
+        </RadzenCard>
     </NotAuthorized>
 </AuthorizeView>
         
