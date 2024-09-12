@@ -1,0 +1,114 @@
+﻿@layout AuthLayout
+@page "/todos"
+
+@using WebTodo.Provider
+@using WebTodo.ViewModels.Todo
+@using System.Net.Http.Headers
+@inject ILocalStorageService localStorage
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject NotificationService notification
+@inject NavigationManager _navigationManager
+@inject HttpClient _http
+@rendermode InteractiveServer
+
+<AuthorizeView Roles="User">
+    <Authorized>
+        <RadzenTemplateForm Context="form_context" TItem="CreateNewTodoViewModel" Data="@newTodoViewModel" Submit="@OnSubmit">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenColumn Style="width: 100%;">
+                    <RadzenFormField Style="width: 100%;">
+                        <RadzenTextBox Name="newTodo" @bind-Value="@newTodoViewModel.Title" Style="width: 100%;" />
+                    </RadzenFormField>
+                    <RadzenRequiredValidator Component="newTodo" Text="Preencha o campo" />
+                </RadzenColumn>
+                <RadzenStack>
+                    <RadzenButton Text="Adicionar" ButtonType="ButtonType.Submit" Style="height:var(--rz-input-height);margin-top: 8px;" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenTemplateForm>
+        <RadzenText class="rz-mt-5">Total de tarefas - @todos.Count</RadzenText>
+
+        @if (todos.Count <= 0)
+        {
+            <p>Não possui nenhuma Tarefa.</p>
+        }
+        else
+        {
+            @foreach (var todo in todos)
+            {
+                <CardTodo Todo="@todo" />
+            }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Sem autorização</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    List<TodosViewModel> todos { get; set; } = [];
+    CreateNewTodoViewModel newTodoViewModel = new();
+    RadzenTemplateForm<CreateNewTodoViewModel> form = new RadzenTemplateForm<CreateNewTodoViewModel>();
+
+    protected override async void OnInitialized()
+    {        
+        var token = await localStorage.GetItemAsync<string>("accessToken");
+        _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            var authStateProvider = (AuthStateProvider)_authenticationStateProvider;
+            authStateProvider.NotifyAuthState(token);
+        }
+
+        var response = await _http.GetAsync("/todo");
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var content = await response.Content.ReadFromJsonAsync<List<TodosViewModel>>();
+            todos.AddRange(content!);
+            StateHasChanged();
+        }
+        else if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _navigationManager.NavigateTo("/login", true);
+        }
+    }
+
+    async void OnSubmit(CreateNewTodoViewModel createNewTodoViewModel)
+    {
+        if (form.IsValid)
+        {
+            var jsonPayload = JsonSerializer.Serialize(newTodoViewModel);
+            var requestContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+            var response = await _http.PostAsync("/todo", requestContent);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var result = await response.Content.ReadFromJsonAsync<TodosViewModel>();
+                todos.Add(result!);
+                newTodoViewModel.Title = "";
+                StateHasChanged();
+
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                ShowNotificationErrorCreateTodo(result);
+            }
+        }
+    }
+
+    private void ShowNotificationErrorCreateTodo(string detail)
+    {
+        NotificationMessage message = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Ocorreu um erro",
+                Detail = detail,
+                Duration = 3000
+            };
+
+        notification.Notify(message);
+    }
+
+}

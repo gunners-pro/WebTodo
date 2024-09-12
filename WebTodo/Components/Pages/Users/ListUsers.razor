@@ -1,0 +1,12 @@
+﻿@layout AuthLayout
+@page "/users"
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <h3>Listar usuários</h3>
+    </Authorized>
+    <NotAuthorized>
+        <h3>Sem permissão</h3>
+    </NotAuthorized>
+</AuthorizeView>
+        

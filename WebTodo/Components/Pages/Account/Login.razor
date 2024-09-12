@@ -5,8 +5,6 @@
 @inject NotificationService notification
 @inject ILocalStorageService localStorage
 
-<PageTitle>Login</PageTitle>
-
 <RadzenRow Style="height: 100vh;">
     <RadzenStack Style="width: 60%;" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
         <RadzenImage Path="next_tasks.png" Style="width: 50%;" AlternateText="Tarefa" />
@@ -67,7 +65,7 @@
             {
                 var result = await response.Content.ReadFromJsonAsync<ResultSuccessDTO>();
                 await localStorage.SetItemAsync<string>("accessToken", result!.token);
-                navigationManager.NavigateTo("/todos");
+                navigationManager.NavigateTo("/todos", true);
             }
         }
     }
