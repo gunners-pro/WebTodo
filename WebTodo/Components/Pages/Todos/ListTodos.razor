@@ -9,6 +9,7 @@
 @inject NotificationService notification
 @inject NavigationManager _navigationManager
 @inject HttpClient _http
+@inject DialogService _dialogService
 @rendermode InteractiveServer
 
 <AuthorizeView Roles="User">
@@ -46,7 +47,34 @@
             </RadzenBadge>
             @foreach (var todo in todos)
             {
-                <CardTodo Todo="@todo" />
+                <RadzenCard class="rz-my-8">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                        <RadzenStack>
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0">
+                                <RadzenCheckBox @bind-Value="@todo.isCompleted" Name="CheckBox1" />
+                                <RadzenLabel Text="@todo.title" Component="CheckBox1" class="rz-ms-2" Style="margin-top:-3px; text-align:justify;" />
+                            </RadzenStack>
+                            <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Dark" IsPill="true" Style="width:fit-content;" class="rz-p-1">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0; text-transform: none;">
+                                    <RadzenIcon Icon="date_range" Style="font-size: 1rem" /> Criado em: @DateOnly.Parse(todo.createdOn)
+                                </RadzenStack>
+                            </RadzenBadge>
+                        </RadzenStack>
+                        <RadzenStack>
+                            <RadzenButton ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Style="width:6rem; padding:4px;">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0;">
+                                    <RadzenIcon Icon="launch" Style="font-size: 1rem" /> Editar
+                                </RadzenStack>
+                            </RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Style="width:6rem; padding:4px;"
+                                          Click=@(args => DeleteTodo(todo.id))>
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0;">
+                                    <RadzenIcon Icon="delete" Style="font-size: 1rem" /> Deletar
+                                </RadzenStack>
+                            </RadzenButton>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
             }
         }
     </Authorized>
@@ -121,4 +149,52 @@
         notification.Notify(message);
     }
 
+    private record ResultContent
+    {
+        public string message { get; set; } = string.Empty;
+    }
+
+    private async void DeleteTodo(string id)
+    {
+        var dialog = await _dialogService.Confirm("Tem certeza?", "Deletar tarefa", new ConfirmOptions()
+            {
+                OkButtonText = "Sim",
+                CancelButtonText = "Não",
+                ShowClose = false
+            });
+
+        if (dialog.HasValue && dialog.Value)
+        {
+            var response = await _http.DeleteAsync($"/todo/{id}");
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                var content = await response.Content.ReadFromJsonAsync<ResultContent>();
+
+                NotificationMessage message = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Ocorreu um erro",
+                        Detail = content!.message,
+                        Duration = 3000
+                    };
+
+                notification.Notify(message);
+            }
+            else if (response.StatusCode == HttpStatusCode.OK)
+            {
+
+                NotificationMessage message = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Sucesso",
+                        Detail = "Tarefa deletada!",
+                        Duration = 3000
+                    };
+                notification.Notify(message);
+                var todoToBeDeleted = todos.Where(t => t.id.Equals(id)).FirstOrDefault();
+                todos.Remove(todoToBeDeleted!);
+                StateHasChanged();
+            }
+        }
+    }
 }
