@@ -4,16 +4,20 @@
 
 <RadzenLayout Style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body'">
     <RadzenHeader>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
-            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="0">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
                 <AuthorizeView>
                     <Authorized>
-                    @foreach (var claim in @context.User.Claims.Where(c => c.Type.Equals(ClaimTypes.Email)))
-                    {
-                        <RadzenText Style="color: white;margin-bottom:0;">Usuário: @claim.Value</RadzenText>                        
-                    }                    
+                        @foreach (var claim in @context.User.Claims.Where(c => c.Type.Equals(ClaimTypes.Email)))
+                        {
+                            <RadzenText Style="color: white;margin-bottom:0;">Usuário: @claim.Value</RadzenText>
+                        }
                     </Authorized>
                 </AuthorizeView>
+            </RadzenStack>
+
+            <RadzenButton Icon="exit_to_app" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Text="Sair" />
         </RadzenStack>
     </RadzenHeader>
     <RadzenSidebar @bind-Expanded="@sidebarExpanded">
