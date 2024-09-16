@@ -1,6 +1,8 @@
 ﻿@using System.Security.Claims
 @inherits LayoutComponentBase
 <RadzenComponents @rendermode="InteractiveServer" />
+@inject ILocalStorageService _localStorageService
+@inject NavigationManager _navigationManager
 
 <RadzenLayout Style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body'">
     <RadzenHeader>
@@ -17,7 +19,7 @@
                 </AuthorizeView>
             </RadzenStack>
 
-            <RadzenButton Icon="exit_to_app" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Text="Sair" />
+            <RadzenButton Icon="exit_to_app" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Text="Sair" Click="@HandleLogout" />
         </RadzenStack>
     </RadzenHeader>
     <RadzenSidebar @bind-Expanded="@sidebarExpanded">
@@ -37,4 +39,10 @@
 
 @code {
     bool sidebarExpanded = true;
+
+    public async void HandleLogout()
+    {
+        await _localStorageService.RemoveItemAsync("accessToken");
+        _navigationManager.NavigateTo("/login");
+    }
 }
