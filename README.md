@@ -1,4 +1,4 @@
-## 🚀 API TODO
+## 🚀 WEB TODO
 <div align="justify">Uma aplicação Web feita com Blazor. É simplesmente um gerenciador de tarefas, onde é possível:<br /><br />
   - Adicionar novas tarefas<br />
   - Listar todas as tarefas<br />
@@ -42,7 +42,5 @@ do repositorio ApiTodo.<br />
   dotnet run
 ```  
 <br />
-<video style="width:70%" controls>
-  <source src="login.mp4">
-  Your browser does not support the video tag.
-</video>
+
+https://github.com/user-attachments/assets/a2c2f4c2-a8c1-4c2a-ac67-836debbfd497
