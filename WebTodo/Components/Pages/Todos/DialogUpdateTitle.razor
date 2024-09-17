@@ -1,0 +1,65 @@
+﻿@inject DialogService _dialogService
+@inject HttpClient _http
+@inject NotificationService _notification
+@inject NavigationManager _navigationManager
+
+<RadzenStack>
+    <RadzenTemplateForm TItem="ModelTitle" Data=@model Submit=@OnSubmit>
+        <RadzenFormField Text="Novo título" Style="width: 100%;">
+            <ChildContent>
+                <RadzenTextBox @bind-Value="@model.Title" Name="Title" />
+            </ChildContent>
+            <Helper>
+                <RadzenRequiredValidator Component="Title" Text="Preencha o campo título." />
+            </Helper>
+        </RadzenFormField>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" class="rz-mt-8">
+            <RadzenButton Text="Cancelar" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Click="@(() => _dialogService.Close(true))" />
+            <RadzenButton Text="Atualizar" ButtonType="ButtonType.Submit" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public required string Id { get; set; }
+
+    ModelTitle model = new ModelTitle();
+
+    private class ModelTitle
+    {
+        public string? Title { get; set; }
+    }
+
+    private async void OnSubmit()
+    {
+        var jsonPayload = JsonSerializer.Serialize(model);
+        var requestContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+        var response = await _http.PutAsync($"/todo/{Id}", requestContent);
+
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            ShowNotification("Tarefa atualizada!", NotificationSeverity.Success);            
+            _dialogService.Close(model.Title);
+        }
+        else
+        {
+            var result = await response.Content.ReadAsStringAsync();
+            ShowNotification(result, NotificationSeverity.Error);
+        }
+    }
+
+    private void ShowNotification(string detail, NotificationSeverity severity)
+    {
+        NotificationMessage message = new NotificationMessage
+            {
+                Severity = severity,
+                Summary = "Info",
+                Detail = detail,
+                Duration = 3000
+            };
+
+        _notification.Notify(message);
+    }
+}
