@@ -40,42 +40,82 @@
         }
         else
         {
-            <RadzenBadge BadgeStyle="BadgeStyle.Light" Style="text-transform:none;" class="rz-mt-4">
+            <RadzenBadge BadgeStyle="BadgeStyle.Light" Style="text-transform:none;" class="rz-my-4">
                 <RadzenStack Orientation="Orientation.Horizontal">
                     <RadzenText Style="margin-bottom:0;">Total de tarefas - @todos.Count</RadzenText>
                 </RadzenStack>
             </RadzenBadge>
-            @foreach (var todo in todos)
-            {
-                <RadzenCard class="rz-my-8">
-                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-                        <RadzenStack>
-                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0">
-                                <RadzenCheckBox @bind-Value="@todo.isCompleted" Name="CheckBox1" />
-                                <RadzenLabel Text="@todo.title" Component="CheckBox1" class="rz-ms-2" Style="margin-top:-3px; text-align:justify;" />
-                            </RadzenStack>
-                            <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Dark" IsPill="true" Style="width:fit-content;" class="rz-p-1">
-                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0; text-transform: none;">
-                                    <RadzenIcon Icon="date_range" Style="font-size: 1rem" /> Criado em: @DateOnly.Parse(todo.createdOn)
+
+            <RadzenTabs Change="() => {}" TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Client">
+                <Tabs>
+                    <RadzenTabsItem Text="À Fazer">
+                        @foreach (var todo in todos.Where(t => t.isCompleted == false))
+                        {
+                            <RadzenCard class="rz-my-8">
+                                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                                    <RadzenStack>
+                                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0">
+                                            <RadzenCheckBox @bind-Value="@todo.isCompleted" Name="CheckBox1" />
+                                            <RadzenLabel Text="@todo.title" Component="CheckBox1" class="rz-ms-2" Style="margin-top:-3px; text-align:justify;" />
+                                        </RadzenStack>
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Dark" IsPill="true" Style="width:fit-content;" class="rz-p-1">
+                                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0; text-transform: none;">
+                                                <RadzenIcon Icon="date_range" Style="font-size: 1rem" /> Criado em: @DateOnly.Parse(todo.createdOn)
+                                            </RadzenStack>
+                                        </RadzenBadge>
+                                    </RadzenStack>
+                                    <RadzenStack>
+                                        <RadzenButton ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Style="width:6rem; padding:4px;" Click="@(() => OpenDialogUpdateTitle(todo.id))">
+                                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0;">
+                                                <RadzenIcon Icon="launch" Style="font-size: 1rem" /> Editar
+                                            </RadzenStack>
+                                        </RadzenButton>
+                                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Style="width:6rem; padding:4px;"
+                                                      Click=@(args => DeleteTodo(todo.id))>
+                                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0;">
+                                                <RadzenIcon Icon="delete" Style="font-size: 1rem" /> Deletar
+                                            </RadzenStack>
+                                        </RadzenButton>
+                                    </RadzenStack>
                                 </RadzenStack>
-                            </RadzenBadge>
-                        </RadzenStack>
-                        <RadzenStack>
-                            <RadzenButton ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Style="width:6rem; padding:4px;" Click="@(() => OpenDialogUpdateTitle(todo.id))">
-                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0;">
-                                    <RadzenIcon Icon="launch" Style="font-size: 1rem" /> Editar
+                            </RadzenCard>
+                        }            
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Completas">
+                        @foreach (var todo in todos.Where(t => t.isCompleted == true))
+                        {
+                            <RadzenCard class="rz-my-8">
+                                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                                    <RadzenStack>
+                                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0">
+                                            <RadzenCheckBox @bind-Value="@todo.isCompleted" Name="CheckBox1" />
+                                            <RadzenLabel Text="@todo.title" Component="CheckBox1" class="rz-ms-2" Style="margin-top:-3px; text-align:justify;" />
+                                        </RadzenStack>
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Dark" IsPill="true" Style="width:fit-content;" class="rz-p-1">
+                                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0; text-transform: none;">
+                                                <RadzenIcon Icon="date_range" Style="font-size: 1rem" /> Criado em: @DateOnly.Parse(todo.createdOn)
+                                            </RadzenStack>
+                                        </RadzenBadge>
+                                    </RadzenStack>
+                                    <RadzenStack>
+                                        <RadzenButton ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Style="width:6rem; padding:4px;" Click="@(() => OpenDialogUpdateTitle(todo.id))">
+                                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0;">
+                                                <RadzenIcon Icon="launch" Style="font-size: 1rem" /> Editar
+                                            </RadzenStack>
+                                        </RadzenButton>
+                                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Style="width:6rem; padding:4px;"
+                                                      Click=@(args => DeleteTodo(todo.id))>
+                                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0;">
+                                                <RadzenIcon Icon="delete" Style="font-size: 1rem" /> Deletar
+                                            </RadzenStack>
+                                        </RadzenButton>
+                                    </RadzenStack>
                                 </RadzenStack>
-                            </RadzenButton>
-                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Style="width:6rem; padding:4px;"
-                                          Click=@(args => DeleteTodo(todo.id))>
-                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0;">
-                                    <RadzenIcon Icon="delete" Style="font-size: 1rem" /> Deletar
-                                </RadzenStack>
-                            </RadzenButton>
-                        </RadzenStack>
-                    </RadzenStack>
-                </RadzenCard>
-            }
+                            </RadzenCard>
+                        }
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>           
         }
     </Authorized>
     <NotAuthorized>
@@ -200,8 +240,11 @@
 
     private async Task OpenDialogUpdateTitle(string id)
     {
-        var result = await _dialogService.OpenAsync<DialogUpdateTitle>("Atualizar tarefa", new Dictionary<string, object>() { { "Id", id } });
-        var indexTodo = todos.FindIndex(t => t.id == id);
-        todos[indexTodo].title = result;
+        dynamic result = await _dialogService.OpenAsync<DialogUpdateTitle>("Atualizar tarefa", new Dictionary<string, object>() { { "Id", id } });
+        if(result is string)
+        {
+            var indexTodo = todos.FindIndex(t => t.id == id);
+            todos[indexTodo].title = result;
+        }        
     }
 }
