@@ -12,7 +12,7 @@
 @inject DialogService _dialogService
 @rendermode InteractiveServer
 
-<AuthorizeView Roles="User">
+<AuthorizeView Roles="User,Admin">
     <Authorized>
         <RadzenTemplateForm Context="form_context" TItem="CreateNewTodoViewModel" Data="@newTodoViewModel" Submit="@OnSubmit">
             <RadzenStack Orientation="Orientation.Horizontal">
